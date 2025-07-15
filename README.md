@@ -282,3 +282,8 @@ Oh My Zsh เป็นตัวจัดการ config ของ zsh ที่
     ```
     source ~/.zshrc
     ```
+
+### วิธีรัน Powerlevel10k Wizard ใหม่อีกครั้ง
+```
+p10k configure
+```
