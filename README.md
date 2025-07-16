@@ -287,3 +287,46 @@ Oh My Zsh เป็นตัวจัดการ config ของ zsh ที่
 ```
 p10k configure
 ```
+
+## Error
+```
+error: GPGME error: No data
+error: GPGME error: No data
+error: failed to synchronize all databases (invalid or corrupted database (PGP signature))
+ -> error refreshing databases - exit status 1
+```
+ข้อผิดพลาดนี้หมายความว่า Pacman มีปัญหากับ GPG key ที่ใช้ตรวจสอบลายเซ็นของฐานข้อมูลแพ็กเกจ (เช่น core, extra, community ฯลฯ) ซึ่งอาจเกิดจาก:
+- ฐานข้อมูลแพ็กเกจเสียหาย
+- ปัญหากับ keyring (กุญแจ GPG สำหรับตรวจสอบลายเซ็น)
+- การ sync keyring ล้มเหลว
+### วิธีแก้ทีละขั้นตอน:
+1. **ล้างฐานข้อมูลแพ็กเกจที่โหลดมาบางส่วน (cache)**
+    ```
+    sudo rm -r /var/lib/pacman/sync
+    ```
+2. **รีเซ็ต keyring แล้วอัปเดตใหม่ทั้งหมด**
+    ```
+    sudo pacman-key --init
+    sudo pacman-key --populate archlinux
+    ```
+3. **ลองอัปเดตฐานข้อมูลใหม่**
+    ```
+    sudo pacman -Sy
+    ```
+### ถ้ายังไม่หาย ให้ลองขั้นตอนเสริม:
+4. **ลบ keyring ทั้งระบบแล้วเริ่มใหม่ (ใช้ถ้า --populate ไม่ช่วย)**
+    ```
+    sudo rm -rf /etc/pacman.d/gnupg
+    sudo pacman-key --init
+    sudo pacman-key --populate archlinux
+    ```
+    แล้วลองใหม่:
+    ```
+    sudo pacman -Syyu
+    ```
+### ทางเลือกสุดท้าย (ถ้ายังไม่หาย):
+แก้ชั่วคราวโดย ปิดการตรวจสอบ PGP (ไม่แนะนำในระยะยาว):
+```
+sudo pacman -Sy --disable-download-timeout --disable-verification
+```
+แต่ ไม่ควรใช้บ่อย เพราะจะลดความปลอดภัย
